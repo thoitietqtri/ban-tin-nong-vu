@@ -24,7 +24,6 @@
     button { padding:6px 12px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
     button:hover { background:#f1f5f9; }
 
-    /* Popup chọn định dạng */
     .modal {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.4);
@@ -62,7 +61,6 @@
   </div>
 </div>
 
-<!-- Modal chọn PDF / DOCX -->
 <div class="modal" id="formatModal">
   <div class="modal-box">
     <h3>Chọn định dạng</h3>
@@ -73,11 +71,9 @@
 </div>
 
 <script>
-/* ================== CẤU HÌNH ================== */
 const OWNER = "thoitietqtri";
 const REPO  = "ban-tin-nong-vu";
 const FOLDER_PATH = "files/BAN-TIN-NONG-VU";
-/* ============================================ */
 
 const listEl = document.getElementById("list");
 const viewer = document.getElementById("viewer");
@@ -96,23 +92,17 @@ function baseName(url){
   catch { return url; }
 }
 
-function absoluteUrl(rel){
-  return rel.startsWith("http") ? rel : new URL(rel, window.location.href).href;
-}
-
 function showPdf(url){
-  const abs = absoluteUrl(url);
-  currentUrl = abs;
+  currentUrl = url;
   fileNameEl.textContent = baseName(url);
-  const gview = `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(abs)}`;
-  viewer.innerHTML = `<iframe class="docframe" src="${gview}"></iframe>`;
+  const pdfjs = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(url)}`;
+  viewer.innerHTML = `<iframe class="docframe" src="${pdfjs}"></iframe>`;
 }
 
 function showDocx(url){
-  const abs = absoluteUrl(url);
-  currentUrl = abs;
+  currentUrl = url;
   fileNameEl.textContent = baseName(url);
-  const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(abs)}`;
+  const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
   viewer.innerHTML = `<iframe class="docframe" src="${officeUrl}"></iframe>`;
 }
 
@@ -139,7 +129,6 @@ btnDocx.onclick = () => {
   showDocx(currentItem.docx_url);
 };
 
-// Parse tên file: ban-tin-nong-vu-thang-01-2026.pdf/.docx
 function parseFile(name){
   const m = name.match(/ban-tin-nong-vu-thang-(\d{2})-(\d{4})\.(pdf|docx)$/i);
   if(!m) return null;
