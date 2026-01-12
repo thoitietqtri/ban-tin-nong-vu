@@ -9,12 +9,13 @@
     "is_active": true
   },
   {
-    "id": "2025-12",
-    "month": 12,
+    "id": "2025-02",
+    "month": 02,
     "year": 2025,
-    "title": "Bản tin nông vụ tháng 12/2025",
-    "pdf_url": "files/2025-12/ban-tin-nong-vu-thang-12.pdf",
-    "docx_url": "files/2025-12/ban-tin-nong-vu-thang-12.docx",
+    "title": "Bản tin nông vụ tháng 02/2025",
+    "pdf_url": "files/2025-02/ban-tin-nong-vu-thang-02.pdf",
+    "docx_url": "files/2025-02/ban-tin-nong-vu-thang-02.docx",
     "is_active": true
   }
 ]
+
