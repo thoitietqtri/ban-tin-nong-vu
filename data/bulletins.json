@@ -6,7 +6,6 @@
     "frequency": "monthly",
     "summary": "Dự báo thời tiết và khuyến nghị sản xuất vụ Đông Xuân.",
     "doc_url": "files/2026-01/ban-tin-thang-1.docx",
-    "data_url": "files/2026-01/bang-so-lieu-thang-1.xlsx",
     "is_active": true
   },
   {
@@ -20,6 +19,7 @@
     "is_active": true
   }
 ]
+
 
 
 
