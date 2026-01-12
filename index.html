@@ -52,7 +52,7 @@
     <aside class="pane left" id="list"></aside>
     <section class="pane right">
       <div class="viewer-toolbar">
-        <button id="openNew">↗ Tải file về</button>
+        <button id="openNew">↗ Mở tab mới</button>
         <span id="fileName" class="muted"></span>
       </div>
       <div class="viewer-area" id="viewer">
@@ -73,6 +73,12 @@
 </div>
 
 <script>
+/* ================== CẤU HÌNH ================== */
+const OWNER = "thoitietqtri";              // GitHub username
+const REPO  = "ban-tin-nong-vu";          // Tên repo
+const FOLDER_PATH = "files/BAN-TIN-NONG-VU"; // Thư mục chứa file
+/* ============================================ */
+
 const listEl = document.getElementById("list");
 const viewer = document.getElementById("viewer");
 const fileNameEl = document.getElementById("fileName");
@@ -91,7 +97,7 @@ function baseName(url){
 }
 
 function absoluteUrl(rel){
-  return new URL(rel, window.location.href).href;
+  return rel.startsWith("http") ? rel : new URL(rel, window.location.href).href;
 }
 
 function showPdf(url){
@@ -132,28 +138,53 @@ btnDocx.onclick = () => {
   showDocx(currentItem.docx_url);
 };
 
-async function loadData(){
-  const res = await fetch("data/bulletins.json");
-  const data = await res.json();
+// Parse tên file theo quy ước: ban-tin-nong-vu-thang-01-2026.pdf/.docx
+function parseFile(name){
+  const m = name.match(/ban-tin-nong-vu-thang-(\d{2})-(\d{4})\.(pdf|docx)$/i);
+  if(!m) return null;
+  return { month: parseInt(m[1],10), year: parseInt(m[2],10), ext: m[3].toLowerCase() };
+}
 
-  // Lọc active + sắp xếp mới nhất lên trên
-  const items = data
-    .filter(x => x.is_active)
-    .sort((a,b) => (b.year*100 + b.month) - (a.year*100 + a.month));
+async function loadFromGitHub(){
+  const api = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER_PATH}`;
+  const res = await fetch(api);
+  if(!res.ok){
+    listEl.innerHTML = `<div class="muted">Không đọc được thư mục GitHub.</div>`;
+    return;
+  }
+  const files = await res.json();
+
+  // Gom theo tháng/năm
+  const map = {};
+  files.forEach(f => {
+    if(f.type !== "file") return;
+    const p = parseFile(f.name);
+    if(!p) return;
+    const key = `${p.year}-${String(p.month).padStart(2,"0")}`;
+    if(!map[key]) map[key] = { year: p.year, month: p.month, pdf_url:null, docx_url:null };
+    if(p.ext === "pdf")  map[key].pdf_url  = f.download_url;
+    if(p.ext === "docx") map[key].docx_url = f.download_url;
+  });
+
+  // Chỉ lấy những tháng có đủ cả PDF + DOCX
+  let items = Object.values(map).filter(x => x.pdf_url && x.docx_url);
+
+  // Sắp xếp mới nhất lên trên
+  items.sort((a,b) => (b.year*100 + b.month) - (a.year*100 + a.month));
 
   listEl.innerHTML = "";
-
   if(items.length === 0){
-    listEl.innerHTML = "<div class='muted'>Chưa có bản tin</div>";
+    listEl.innerHTML = "<div class='muted'>Chưa có bản tin hợp lệ.</div>";
     return;
   }
 
-  items.forEach((it, idx) => {
+  items.forEach(it => {
     const div = document.createElement("div");
     div.className = "item";
+    const title = `Bản tin nông vụ tháng ${it.month}/${it.year}`;
     div.innerHTML = `
-      <div class="title">${it.title}</div>
-      <div class="muted">Tháng ${it.month}/${it.year}</div>
+      <div class="title">${title}</div>
+      <div class="muted">Có PDF & DOCX</div>
     `;
     div.onclick = () => {
       document.querySelectorAll(".item").forEach(e => e.classList.remove("selected"));
@@ -164,8 +195,7 @@ async function loadData(){
   });
 }
 
-loadData();
+loadFromGitHub();
 </script>
 </body>
 </html>
-
