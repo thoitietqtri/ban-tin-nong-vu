@@ -3,20 +3,21 @@
     "id": "2026-01",
     "month": 1,
     "year": 2026,
-    "title": "Bản tin nông vụ tháng 1/2026",
-    "pdf_url": "files/2026-01/ban-tin-nong-vu-thang-01.pdf",
-    "docx_url": "files/2026-01/ban-tin-nong-vu-thang-01.docx",
+    "title": "Bản tin nông vụ tháng 01/2026",
+    "pdf_url": "files/2026-01/ban-tin-nong-vu-thang-1.pdf",
+    "docx_url": "files/2026-01/ban-tin-nong-vu-thang-1.docx",
     "is_active": true
   },
   {
-    "id": "2025-02",
+    "id": "2026-02",
     "month": 2,
-    "year": 2025,
-    "title": "Bản tin nông vụ tháng 02/2025",
-    "pdf_url": "files/2025-02/ban-tin-nong-vu-thang-02.pdf",
-    "docx_url": "files/2025-02/ban-tin-nong-vu-thang-02.docx",
+    "year": 2026,
+    "title": "Bản tin nông vụ tháng 02/2026",
+    "pdf_url": "files/2025-02/ban-tin-nong-vu-thang-2.pdf",
+    "docx_url": "files/2025-02/ban-tin-nong-vu-thang-2.docx",
     "is_active": true
   }
 ]
+
 
 
