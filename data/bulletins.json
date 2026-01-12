@@ -7,7 +7,6 @@
     "summary": "Dự báo thời tiết và khuyến nghị sản xuất vụ Đông Xuân.",
     "doc_url": "files/2026-01/ban-tin-thang-1.docx",
     "data_url": "files/2026-01/bang-so-lieu-thang-1.xlsx",
-    "data_url": "files/2026-01/ban-tin-thang-1.pdf",
     "is_active": true
   },
   {
@@ -16,11 +15,13 @@
     "published_on": "2026-01-12",
     "frequency": "alert",
     "summary": "Khả năng rét đậm ảnh hưởng đến lúa mới cấy.",
-    "doc_url": "files/2026-01/canh-bao-ret.pdf",
+    "doc_url": "files/2026-01/ban-tin-thang-1.pdf",
     "data_url": "",
     "is_active": true
   }
 ]
+
+
 
 
 
