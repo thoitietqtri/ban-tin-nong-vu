@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BẢN TIN NÔNG VỤ</title>
+  <title>Bản tin nông vụ</title>
   <style>
     body { margin:0; font-family: system-ui, Arial; background:#f6f7ff; }
     .wrap { max-width:1200px; margin:0 auto; padding:10px; }
@@ -16,12 +16,29 @@
     .item.selected { outline:3px solid #22c55e; }
     .title { font-weight:700; margin:6px 0; }
     .muted { color:#64748b; font-size:12px; }
+
     .viewer-toolbar { padding:8px; border-bottom:1px solid #e2e8f0; background:#fafafa; display:flex; gap:10px; align-items:center; }
     .docframe { width:100%; height:100%; border:0; }
     .viewer-area { height: calc(100% - 46px); }
+
     button { padding:6px 12px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
     button:hover { background:#f1f5f9; }
-    img { max-width:100%; }
+
+    /* Popup chọn định dạng */
+    .modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display:none; align-items:center; justify-content:center;
+      z-index: 999;
+    }
+    .modal-box {
+      background:#fff; padding:20px; border-radius:12px;
+      max-width:300px; width:90%;
+      text-align:center;
+    }
+    .modal-box h3 { margin-top:0; }
+    .modal-box button { width:100%; margin-top:10px; }
+
     @media (max-width: 900px){
       .split { grid-template-columns:1fr; height:auto; }
       .pane { min-height:300px; }
@@ -30,7 +47,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h2>📄 Bản tin nông vụ</h2>
+  <h2>📄 BẢN TIN NÔNG VỤ</h2>
   <div class="split">
     <aside class="pane left" id="list"></aside>
     <section class="pane right">
@@ -45,68 +62,84 @@
   </div>
 </div>
 
+<!-- Modal chọn PDF / DOCX -->
+<div class="modal" id="formatModal">
+  <div class="modal-box">
+    <h3>Chọn định dạng</h3>
+    <button id="btnPdf">📄 Xem PDF</button>
+    <button id="btnDocx">📝 Xem DOCX</button>
+    <button onclick="closeModal()">Huỷ</button>
+  </div>
+</div>
+
 <script>
 const listEl = document.getElementById("list");
 const viewer = document.getElementById("viewer");
 const fileNameEl = document.getElementById("fileName");
 const openNewBtn = document.getElementById("openNew");
 
+const modal = document.getElementById("formatModal");
+const btnPdf = document.getElementById("btnPdf");
+const btnDocx = document.getElementById("btnDocx");
+
 let currentUrl = null;
+let currentItem = null;
 
 function baseName(url){
-  try {
-    return decodeURIComponent(url.split('/').pop());
-  } catch { return url; }
-}
-
-function getExt(url){
-  return url.split('.').pop().toLowerCase().split('?')[0];
+  try { return decodeURIComponent(url.split('/').pop()); }
+  catch { return url; }
 }
 
 function absoluteUrl(rel){
   return new URL(rel, window.location.href).href;
 }
 
-function showInViewer(url){
-  currentUrl = url;
-  fileNameEl.textContent = baseName(url);
-
-  const ext = getExt(url);
+function showPdf(url){
   const abs = absoluteUrl(url);
+  currentUrl = abs;
+  fileNameEl.textContent = baseName(url);
+  viewer.innerHTML = `<iframe class="docframe" src="${abs}"></iframe>`;
+}
 
-  // PDF
-  if(ext === "pdf"){
-    viewer.innerHTML = `<iframe class="docframe" src="${abs}"></iframe>`;
-    return;
-  }
-
-  // Office formats
-  if(["doc","docx","xls","xlsx","ppt","pptx"].includes(ext)){
-    const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(abs)}`;
-    viewer.innerHTML = `<iframe class="docframe" src="${officeUrl}"></iframe>`;
-    return;
-  }
-
-  // Images
-  if(["png","jpg","jpeg","gif","webp"].includes(ext)){
-    viewer.innerHTML = `<div style="padding:10px;text-align:center"><img src="${abs}"></div>`;
-    return;
-  }
-
-  // Google fallback
-  const googleUrl = `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(abs)}`;
-  viewer.innerHTML = `<iframe class="docframe" src="${googleUrl}"></iframe>`;
+function showDocx(url){
+  const abs = absoluteUrl(url);
+  currentUrl = abs;
+  fileNameEl.textContent = baseName(url);
+  const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(abs)}`;
+  viewer.innerHTML = `<iframe class="docframe" src="${officeUrl}"></iframe>`;
 }
 
 openNewBtn.onclick = () => {
   if(currentUrl) window.open(currentUrl, "_blank");
 };
 
+function openModal(item){
+  currentItem = item;
+  modal.style.display = "flex";
+}
+
+function closeModal(){
+  modal.style.display = "none";
+}
+
+btnPdf.onclick = () => {
+  closeModal();
+  showPdf(currentItem.pdf_url);
+};
+
+btnDocx.onclick = () => {
+  closeModal();
+  showDocx(currentItem.docx_url);
+};
+
 async function loadData(){
   const res = await fetch("data/bulletins.json");
   const data = await res.json();
 
-  const items = data.filter(x => x.is_active && x.doc_url);
+  // Lọc active + sắp xếp mới nhất lên trên
+  const items = data
+    .filter(x => x.is_active)
+    .sort((a,b) => (b.year*100 + b.month) - (a.year*100 + a.month));
 
   listEl.innerHTML = "";
 
@@ -119,21 +152,15 @@ async function loadData(){
     const div = document.createElement("div");
     div.className = "item";
     div.innerHTML = `
-      <div class="muted">${it.published_on || ""}</div>
-      <div class="title">${it.title || "Bản tin"}</div>
-      <div class="muted">${it.summary || ""}</div>
+      <div class="title">${it.title}</div>
+      <div class="muted">Tháng ${it.month}/${it.year}</div>
     `;
     div.onclick = () => {
       document.querySelectorAll(".item").forEach(e => e.classList.remove("selected"));
       div.classList.add("selected");
-      showInViewer(it.doc_url);
+      openModal(it);
     };
     listEl.appendChild(div);
-
-    if(idx === 0){
-      div.classList.add("selected");
-      showInViewer(it.doc_url);
-    }
   });
 }
 
@@ -141,3 +168,4 @@ loadData();
 </script>
 </body>
 </html>
+
