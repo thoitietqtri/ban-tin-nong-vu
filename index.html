@@ -52,7 +52,7 @@
     <aside class="pane left" id="list"></aside>
     <section class="pane right">
       <div class="viewer-toolbar">
-        <button id="openNew">↗ Tải file về</button>
+        <button id="openNew">↗ Mở tab mới</button>
         <span id="fileName" class="muted"></span>
       </div>
       <div class="viewer-area" id="viewer">
@@ -74,9 +74,9 @@
 
 <script>
 /* ================== CẤU HÌNH ================== */
-const OWNER = "thoitietqtri";              // GitHub username
-const REPO  = "ban-tin-nong-vu";          // Tên repo
-const FOLDER_PATH = "files/BAN-TIN-NONG-VU"; // Thư mục chứa file
+const OWNER = "thoitietqtri";
+const REPO  = "ban-tin-nong-vu";
+const FOLDER_PATH = "files/BAN-TIN-NONG-VU";
 /* ============================================ */
 
 const listEl = document.getElementById("list");
@@ -104,7 +104,8 @@ function showPdf(url){
   const abs = absoluteUrl(url);
   currentUrl = abs;
   fileNameEl.textContent = baseName(url);
-  viewer.innerHTML = `<iframe class="docframe" src="${abs}"></iframe>`;
+  const gview = `https://docs.google.com/gview?embedded=1&url=${encodeURIComponent(abs)}`;
+  viewer.innerHTML = `<iframe class="docframe" src="${gview}"></iframe>`;
 }
 
 function showDocx(url){
@@ -138,7 +139,7 @@ btnDocx.onclick = () => {
   showDocx(currentItem.docx_url);
 };
 
-// Parse tên file theo quy ước: ban-tin-nong-vu-thang-01-2026.pdf/.docx
+// Parse tên file: ban-tin-nong-vu-thang-01-2026.pdf/.docx
 function parseFile(name){
   const m = name.match(/ban-tin-nong-vu-thang-(\d{2})-(\d{4})\.(pdf|docx)$/i);
   if(!m) return null;
@@ -154,7 +155,6 @@ async function loadFromGitHub(){
   }
   const files = await res.json();
 
-  // Gom theo tháng/năm
   const map = {};
   files.forEach(f => {
     if(f.type !== "file") return;
@@ -166,10 +166,7 @@ async function loadFromGitHub(){
     if(p.ext === "docx") map[key].docx_url = f.download_url;
   });
 
-  // Chỉ lấy những tháng có đủ cả PDF + DOCX
   let items = Object.values(map).filter(x => x.pdf_url && x.docx_url);
-
-  // Sắp xếp mới nhất lên trên
   items.sort((a,b) => (b.year*100 + b.month) - (a.year*100 + a.month));
 
   listEl.innerHTML = "";
@@ -199,4 +196,3 @@ loadFromGitHub();
 </script>
 </body>
 </html>
-
