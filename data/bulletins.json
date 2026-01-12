@@ -1,0 +1,22 @@
+[
+  {
+    "id": "bt-001",
+    "title": "Bản tin nông vụ tháng 1/2026",
+    "published_on": "2026-01-10",
+    "frequency": "monthly",
+    "summary": "Dự báo thời tiết và khuyến nghị sản xuất vụ Đông Xuân.",
+    "doc_url": "files/2026-01/ban-tin-01.pdf",
+    "data_url": "",
+    "is_active": true
+  },
+  {
+    "id": "bt-002",
+    "title": "Cảnh báo rét đậm rét hại",
+    "published_on": "2026-01-12",
+    "frequency": "alert",
+    "summary": "Khả năng rét đậm ảnh hưởng đến lúa mới cấy.",
+    "doc_url": "files/2026-01/canh-bao-ret.pdf",
+    "data_url": "",
+    "is_active": true
+  }
+]
